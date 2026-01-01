@@ -1,10 +1,12 @@
 <script lang="ts">
   import CalendarGrid from "$lib/components/CalendarGrid.svelte";
   import { challenges } from "$lib/data/challenges";
+
+  const currentYear = new Date().getFullYear();
 </script>
 
 <main class="shell">
-  <CalendarGrid year={2026} monthIndex0={0} {challenges} />
+  <CalendarGrid year={currentYear} monthIndex0={0} {challenges} />
   <footer class="footer">
     <p>Tip: post a screenshot of your MIDI clip + one sentence about the MIDI focus.</p>
   </footer>
