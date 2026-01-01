@@ -34,8 +34,10 @@
   }
 
   function toggle(day: number) {
-    if (openedDays.has(day)) openedDays.delete(day);
-    else openedDays.add(day);
+    const next = new Set(openedDays);
+    if (next.has(day)) next.delete(day);
+    else next.add(day);
+    openedDays = next;
     saveOpened();
   }
 
