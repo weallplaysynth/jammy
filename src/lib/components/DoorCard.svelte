@@ -62,7 +62,17 @@
       on:pointercancel={pointerUp}
       aria-hidden="true"
     >
-      <span class="hint" aria-hidden="true">{unlocked ? "slide / click" : "locked"}</span>
+      {#if unlocked}
+        <span class="hint" aria-hidden="true">slide / click</span>
+      {:else}
+        <span class="lockIcon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+            <path
+              d="M17 10h-1V8a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2Zm-7-2a2 2 0 1 1 4 0v2h-4V8Zm2 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Z"
+            />
+          </svg>
+        </span>
+      {/if}
     </span>
   </button>
 
@@ -149,6 +159,22 @@
   }
 
   .hint { font-size: 0.85rem; opacity: 0.8; }
+  .lockIcon {
+    position: absolute;
+    bottom: 0.55rem;
+    right: 0.6rem;
+    width: clamp(14px, 2.2vw, 18px);
+    height: clamp(14px, 2.2vw, 18px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+  }
+  .lockIcon svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+  }
 
   [data-locked="true"] .doorCover {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
@@ -178,5 +204,6 @@
     .doorCard { gap: 0.5rem; }
     .doorCover { padding: 0.6rem; }
     .hint { font-size: 0.75rem; }
+    .lockIcon { bottom: 0.45rem; right: 0.5rem; }
   }
 </style>

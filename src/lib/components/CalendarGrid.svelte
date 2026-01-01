@@ -46,9 +46,46 @@
   onMount(loadOpened);
 
   const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+  let lastOpenedDay: number | null = null;
+
+  function resolveFeaturedDay(): number | null {
+    if (lastOpenedDay) return lastOpenedDay;
+    if (openedDays.size) return Math.max(...openedDays);
+    const today = new Date();
+    if (today.getFullYear() === year && today.getMonth() === monthIndex0) {
+      return today.getDate();
+    }
+    return null;
+  }
+
+  $: featuredDay = resolveFeaturedDay();
+  $: featuredChallenge = featuredDay ? challenges[featuredDay - 1] : null;
+
+  function handleToggle(day: number) {
+    lastOpenedDay = day;
+    toggle(day);
+  }
 </script>
 
 <section class="calendar" aria-label="January challenge calendar">
+  <section class="todaysTask" aria-label="Today's task">
+    <div class="todaysHeader">
+      <p class="todaysLabel">Today's Task</p>
+      {#if featuredChallenge}
+        <p class="todaysDay">Day {featuredChallenge.day}</p>
+      {/if}
+    </div>
+
+    {#if featuredChallenge}
+      <h2 class="todaysTitle">{featuredChallenge.title}</h2>
+      <p class="todaysDesc">{featuredChallenge.challenge}</p>
+      <p class="todaysMidi"><strong>MIDI focus:</strong> {featuredChallenge.midiFocus}</p>
+    {:else}
+      <p class="todaysEmpty">Open a day to reveal today’s task details.</p>
+    {/if}
+  </section>
+
   <header class="headerBlock">
     <h1 class="h1">WE ALL PLAY SYNTH : LEARN</h1>
     <p class="sub">Jamuary-style daily synth challenges · January {year}</p>
@@ -69,7 +106,7 @@
               challenge={challenges[cell.day - 1]}
               unlocked={isUnlocked(cell.day, year, monthIndex0)}
               opened={openedDays.has(cell.day)}
-              onToggle={toggle}
+              onToggle={handleToggle}
             />
           {/if}
         {/if}
@@ -84,6 +121,47 @@
     margin: 0 auto;
     padding: clamp(1rem, 3vw, 2.5rem);
   }
+  .todaysTask {
+    border: 1px solid rgba(243, 243, 243, 0.2);
+    border-radius: 20px;
+    padding: clamp(1rem, 2.6vw, 1.6rem);
+    margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+    background: linear-gradient(140deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01));
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+      0 18px 30px rgba(0, 0, 0, 0.35);
+  }
+  .todaysHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.6rem;
+  }
+  .todaysLabel {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.72rem;
+    opacity: 0.7;
+  }
+  .todaysDay {
+    margin: 0;
+    font-size: 0.85rem;
+    opacity: 0.65;
+  }
+  .todaysTitle {
+    margin: 0 0 0.5rem 0;
+    font-size: clamp(1.1rem, 2.6vw, 1.6rem);
+  }
+  .todaysDesc,
+  .todaysMidi,
+  .todaysEmpty {
+    margin: 0.35rem 0 0 0;
+    max-width: 55ch;
+    line-height: 1.5;
+  }
+  .todaysEmpty { opacity: 0.7; }
   .headerBlock { margin: 0.5rem 0 1.5rem 0; }
   .h1 {
     margin: 0;
