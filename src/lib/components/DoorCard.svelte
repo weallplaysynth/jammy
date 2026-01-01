@@ -205,5 +205,6 @@
     .doorCover { padding: 0.6rem; }
     .hint { font-size: 0.75rem; }
     .lockIcon { bottom: 0.45rem; right: 0.5rem; }
+    .panel { display: none; }
   }
 </style>
