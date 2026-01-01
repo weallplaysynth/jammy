@@ -74,25 +74,40 @@
 </article>
 
 <style>
-  .doorCard { position: relative; }
+  .doorCard {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
   .doorButton {
     width: 100%;
     aspect-ratio: 1 / 1;
     position: relative;
     display: block;
-    border: 1px solid currentColor;
-    background: transparent;
+    border: 1px solid rgba(243, 243, 243, 0.35);
+    border-radius: clamp(14px, 2.6vw, 20px);
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01));
+    box-shadow:
+      0 18px 28px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
     padding: 0;
     text-align: left;
+    overflow: hidden;
   }
-  .doorButton:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+  .doorButton:focus-visible { outline: 2px solid rgba(243, 243, 243, 0.9); outline-offset: 3px; }
+  .doorButton:disabled {
+    border-color: rgba(243, 243, 243, 0.15);
+    color: rgba(243, 243, 243, 0.55);
+  }
 
   .dayNumber {
     font-size: clamp(1.25rem, 3vw, 2.25rem);
     font-weight: 700;
     position: absolute;
-    top: 0.65rem;
-    left: 0.75rem;
+    top: 0.75rem;
+    left: 0.85rem;
+    letter-spacing: 0.02em;
   }
 
   /* The “door” */
@@ -100,28 +115,68 @@
     position: absolute;
     inset: 0;
     transform: translateX(calc(var(--coverX, 0) * 100%));
-    border-left: 1px solid currentColor;
-    background: rgba(255,255,255,0.06);
+    border-left: 1px solid rgba(243, 243, 243, 0.25);
+    border-radius: clamp(14px, 2.6vw, 20px);
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02));
     display: grid;
     place-items: end start;
-    padding: 0.75rem;
-    transition: transform 180ms linear;
+    padding: 0.85rem;
+    transition: transform 360ms cubic-bezier(0.4, 0.1, 0.2, 1), opacity 200ms ease 240ms;
+    box-shadow:
+      inset -10px 0 14px rgba(0, 0, 0, 0.2),
+      0 12px 22px rgba(0, 0, 0, 0.25);
+  }
+  .doorCover::before {
+    content: "";
+    position: absolute;
+    top: 14%;
+    right: 16%;
+    width: clamp(10px, 2vw, 16px);
+    height: clamp(10px, 2vw, 16px);
+    border-radius: 999px;
+    border: 1px solid rgba(243, 243, 243, 0.5);
+    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.25);
+    opacity: 0.9;
+  }
+  .doorCover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    pointer-events: none;
   }
 
   .hint { font-size: 0.85rem; opacity: 0.8; }
 
-  [data-locked="true"] .doorCover { background: rgba(255,255,255,0.03); }
-  [data-opened="true"] .doorCover { transform: translateX(100%); }
+  [data-locked="true"] .doorCover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+    box-shadow: inset -6px 0 10px rgba(0, 0, 0, 0.15);
+  }
+  [data-opened="true"] .doorCover {
+    transform: translateX(102%);
+    opacity: 0;
+    pointer-events: none;
+  }
 
   .panel {
-    margin-top: 0.75rem;
-    border: 1px solid currentColor;
-    padding: 0.75rem;
+    border: 1px solid rgba(243, 243, 243, 0.25);
+    border-radius: 14px;
+    padding: 0.85rem;
+    background: rgba(10, 10, 12, 0.7);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
   }
   .title { margin: 0 0 0.4rem 0; font-size: 1rem; }
   .desc, .midi { margin: 0.25rem 0 0 0; }
 
   @media (prefers-reduced-motion: reduce) {
     .doorCover { transition: none; }
+  }
+
+  @media (max-width: 640px) {
+    .doorCard { gap: 0.5rem; }
+    .doorCover { padding: 0.6rem; }
+    .hint { font-size: 0.75rem; }
   }
 </style>

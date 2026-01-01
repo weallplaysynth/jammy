@@ -79,23 +79,33 @@
 </section>
 
 <style>
-  .headerBlock { margin: 1.25rem 0 1.25rem 0; }
+  .calendar {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: clamp(1rem, 3vw, 2.5rem);
+  }
+  .headerBlock { margin: 0.5rem 0 1.5rem 0; }
   .h1 {
     margin: 0;
     font-size: clamp(1.4rem, 3.2vw, 2.4rem);
     letter-spacing: 0.02em;
   }
-  .sub { margin: 0.35rem 0 0 0; opacity: 0.85; }
+  .sub { margin: 0.35rem 0 0 0; opacity: 0.75; }
 
   .weekdays {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-    opacity: 0.85;
+    gap: 0.6rem;
+    margin-bottom: 0.65rem;
+    opacity: 0.8;
     font-size: 0.85rem;
   }
-  .weekday { padding: 0.25rem 0.1rem; }
+  .weekday {
+    padding: 0.25rem 0.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.7rem;
+  }
 
   .grid {
     list-style: none;
@@ -103,7 +113,17 @@
     margin: 0;
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: 0.75rem;
+    gap: clamp(0.5rem, 1.6vw, 0.9rem);
   }
   .cell { min-width: 0; }
+
+  @media (max-width: 760px) {
+    .calendar { padding: 1rem 0.75rem 2rem; }
+    .weekdays { gap: 0.4rem; }
+  }
+
+  @media (max-width: 520px) {
+    .weekdays { font-size: 0.65rem; }
+    .grid { gap: 0.4rem; }
+  }
 </style>
