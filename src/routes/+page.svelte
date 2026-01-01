@@ -8,7 +8,8 @@
 <main class="shell">
   <CalendarGrid year={currentYear} monthIndex0={0} {challenges} />
   <footer class="footer">
-    <p>Tip: post a screenshot of your MIDI clip + one sentence about the MIDI focus.</p>
+    <a href="https://weallplaysynth.com" target="_blank" rel="noopener noreferrer">
+      weallplaysynth.com</a>
   </footer>
 </main>
 

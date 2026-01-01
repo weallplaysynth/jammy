@@ -10,3 +10,11 @@
 a { color: inherit; }
 
 button { color: inherit; font-family: inherit; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.06), transparent 55%),
+    linear-gradient(180deg, #0c0c0f 0%, #070709 100%);
+}
