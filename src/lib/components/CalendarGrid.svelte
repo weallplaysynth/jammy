@@ -75,7 +75,7 @@
   </header>
   <section class="todaysTask" aria-label="Today's task">
     <div class="todaysHeader">
-      <p class="todaysLabel">Today's Task</p>
+      <p class="todaysLabel">Today's Jammy</p>
       {#if featuredChallenge}
         <p class="todaysDay">Day {featuredChallenge.day}</p>
       {/if}
