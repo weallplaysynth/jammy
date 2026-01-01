@@ -69,6 +69,10 @@
 </script>
 
 <section class="calendar" aria-label="January challenge calendar">
+  <header class="headerBlock">
+    <h1 class="h1">JAMMY {year}</h1>
+    <p class="sub">Reveal > Play > Share (#jammy26)</p>
+  </header>
   <section class="todaysTask" aria-label="Today's task">
     <div class="todaysHeader">
       <p class="todaysLabel">Today's Task</p>
@@ -86,10 +90,7 @@
     {/if}
   </section>
 
-  <header class="headerBlock">
-    <h1 class="h1">WE ALL PLAY SYNTH : LEARN</h1>
-    <p class="sub">Jamuary-style daily synth challenges · January {year}</p>
-  </header>
+
 
   <div class="weekdays" role="row" aria-hidden="true">
     {#each weekdays as wd}

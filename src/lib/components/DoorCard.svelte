@@ -63,7 +63,7 @@
       aria-hidden="true"
     >
       {#if unlocked}
-        <span class="hint" aria-hidden="true">slide / click</span>
+        <span class="hint" aria-hidden="true"></span>
       {:else}
         <span class="lockIcon" aria-hidden="true">
           <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
