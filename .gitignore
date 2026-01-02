@@ -136,3 +136,4 @@ dist
 .pnp.*
 .svelte-kit/
 /build
+.svelte-kit/ambient.d.ts

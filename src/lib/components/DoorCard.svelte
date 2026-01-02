@@ -5,6 +5,9 @@
   export let unlocked: boolean;
   export let opened: boolean;
   export let onToggle: (day: number) => void;
+  export let isSelected = false;
+  export let isPast = false;
+  export let isToday = false;
 
   const panelId = (day: number) => `challenge-panel-${day}`;
 
@@ -38,7 +41,14 @@
   }
 </script>
 
-<article class="doorCard" data-opened={opened} data-locked={!unlocked}>
+<article
+  class="doorCard"
+  data-opened={opened}
+  data-locked={!unlocked}
+  data-selected={isSelected}
+  data-today={isToday}
+  data-past={isPast}
+>
   <button
     class="doorButton"
     type="button"
@@ -94,7 +104,8 @@
     width: 100%;
     aspect-ratio: 1 / 1;
     position: relative;
-    display: block;
+    display: grid;
+    place-items: center;
     border: 1px solid rgba(243, 243, 243, 0.35);
     border-radius: clamp(14px, 2.6vw, 20px);
     background: linear-gradient(150deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01));
@@ -104,6 +115,20 @@
     padding: 0;
     text-align: left;
     overflow: hidden;
+    transition:
+      border-color 160ms ease,
+      box-shadow 160ms ease,
+      transform 160ms ease;
+    isolation: isolate;
+  }
+  .doorButton::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 1px solid transparent;
+    pointer-events: none;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
   }
   .doorButton:focus-visible { outline: 2px solid rgba(243, 243, 243, 0.9); outline-offset: 3px; }
   .doorButton:disabled {
@@ -112,12 +137,13 @@
   }
 
   .dayNumber {
-    font-size: clamp(1.25rem, 3vw, 2.25rem);
+    font-size: clamp(1.3rem, 3.6vw, 2.35rem);
     font-weight: 700;
-    position: absolute;
-    top: 0.75rem;
-    left: 0.85rem;
+    position: relative;
     letter-spacing: 0.02em;
+    z-index: 2;
+    line-height: 1;
+    pointer-events: none;
   }
 
   /* The “door” */
@@ -125,6 +151,7 @@
     position: absolute;
     inset: 0;
     transform: translateX(calc(var(--coverX, 0) * 100%));
+    z-index: 1;
     border-left: 1px solid rgba(243, 243, 243, 0.25);
     border-radius: clamp(14px, 2.6vw, 20px);
     background:
@@ -140,10 +167,11 @@
   .doorCover::before {
     content: "";
     position: absolute;
-    top: 14%;
-    right: 16%;
-    width: clamp(10px, 2vw, 16px);
-    height: clamp(10px, 2vw, 16px);
+    top: 50%;
+    right: var(--knob-offset, 12%);
+    transform: translateY(-50%);
+    width: var(--knob-size, clamp(10px, 2vw, 16px));
+    height: var(--knob-size, clamp(10px, 2vw, 16px));
     border-radius: 999px;
     border: 1px solid rgba(243, 243, 243, 0.5);
     box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.25);
@@ -161,10 +189,11 @@
   .hint { font-size: 0.85rem; opacity: 0.8; }
   .lockIcon {
     position: absolute;
-    bottom: 0.55rem;
-    right: 0.6rem;
-    width: clamp(14px, 2.2vw, 18px);
-    height: clamp(14px, 2.2vw, 18px);
+    top: 50%;
+    right: calc(var(--knob-offset, 13%) + (var(--knob-size, clamp(10px, 2vw, 16px)) - var(--lock-size, clamp(10px, 1.8vw, 13px))) / 2);
+    transform: translateY(-50%);
+    width: var(--lock-size, clamp(10px, 1.8vw, 13px));
+    height: var(--lock-size, clamp(10px, 1.8vw, 13px));
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -180,6 +209,44 @@
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
     box-shadow: inset -6px 0 10px rgba(0, 0, 0, 0.15);
   }
+  /* Past default (yellow) */
+  [data-past="true"]:not([data-selected="true"]) .doorButton::before {
+    border-color: rgba(252, 227, 18, 0.95);
+    box-shadow:
+      0 0 0 1px rgba(252, 227, 18, 0.7),
+      0 10px 26px rgba(252, 227, 18, 0.35);
+  }
+  [data-past="true"]:not([data-selected="true"]) .doorCover::after { border-color: rgba(252, 227, 18, 0.5); }
+  [data-past="true"]:not([data-selected="true"]) .dayNumber { color: #fce312; }
+
+  /* Selected (clicked) default blue */
+  [data-selected="true"] .doorButton::before {
+    border-color: rgba(65, 153, 216, 0.95);
+    box-shadow:
+      0 0 0 1px rgba(65, 153, 216, 0.75),
+      0 10px 26px rgba(65, 153, 216, 0.35);
+  }
+  [data-selected="true"] .doorCover::after { border-color: rgba(65, 153, 216, 0.5); }
+  [data-selected="true"] .dayNumber { color: #4199d8; }
+
+  /* Today is always green (overrides selection) */
+  [data-today="true"] .doorButton::before {
+    border-color: rgba(74, 252, 131, 0.95);
+    box-shadow:
+      0 0 0 1px rgba(74, 252, 131, 0.75),
+      0 10px 26px rgba(74, 252, 131, 0.35);
+  }
+  [data-today="true"] .doorCover::after { border-color: rgba(74, 252, 131, 0.55); }
+  [data-today="true"] .dayNumber { color: #4afc83; }
+  [data-selected="true"][data-today="true"] .doorButton::before {
+    border-color: rgba(74, 252, 131, 0.95);
+    box-shadow:
+      0 0 0 1px rgba(74, 252, 131, 0.75),
+      0 10px 26px rgba(74, 252, 131, 0.35);
+  }
+  [data-selected="true"][data-today="true"] .doorCover::after { border-color: rgba(74, 252, 131, 0.55); }
+  [data-selected="true"][data-today="true"] .dayNumber { color: #4afc83; }
+
   [data-opened="true"] .doorCover {
     transform: translateX(102%);
     opacity: 0;
@@ -201,10 +268,27 @@
   }
 
   @media (max-width: 640px) {
-    .doorCard { gap: 0.5rem; }
-    .doorCover { padding: 0.6rem; }
+    .doorCard { gap: 0.45rem; }
+    .doorButton { transform: scale(1.02); }
+    .dayNumber { font-size: clamp(0.75rem, 4.4vw, 0.9rem); }
+    .doorCover { padding: 0.5rem; }
+    .doorCover::before {
+      --knob-size: clamp(8px, 3vw, 12px);
+      --knob-offset: 10%;
+    }
     .hint { font-size: 0.75rem; }
-    .lockIcon { bottom: 0.45rem; right: 0.5rem; }
+    .lockIcon {
+      --lock-size: clamp(8px, 2.6vw, 11px);
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .dayNumber {
+      position: absolute;
+      bottom: 0.4rem;
+      left: 0.35rem;
+      transform: none;
+      text-align: left;
+    }
     .panel { display: none; }
   }
 </style>

@@ -72,6 +72,32 @@
       featuredDay = todayInMonth;
     }
   }
+
+  function isPastDay(day: number) {
+    return todayInMonth ? day < todayInMonth : false;
+  }
+
+  function isTodayDay(day: number) {
+    return todayInMonth ? day === todayInMonth : false;
+  }
+
+  const colors = {
+    green: "#4AFC83",
+    yellow: "#FCE312",
+    blue: "#4199D8"
+  } as const;
+
+  $: accentTone = featuredDay
+    ? featuredDay === todayInMonth
+      ? "green"
+      : "blue"
+    : null;
+  $: accentColor =
+    accentTone === "green"
+      ? colors.green
+      : accentTone === "blue"
+        ? colors.blue
+        : "rgba(243, 243, 243, 0.2)";
 </script>
 
 <section class="calendar" aria-label="January challenge calendar">
@@ -79,7 +105,7 @@
     <h1 class="h1">JAMMY {year}</h1>
     <p class="sub">Reveal > Play > Share (#jammy26)</p>
   </header>
-  <section class="todaysTask" aria-label="Selected task">
+  <section class="todaysTask" aria-label="Selected task" style={`--accent-color: ${accentColor}`}>
     <div class="todaysHeader">
       <div class="todaysMeta">
         <p class="todaysLabel">
@@ -134,6 +160,9 @@
               challenge={challenges[cell.day - 1]}
               unlocked={isUnlocked(cell.day, year, monthIndex0)}
               opened={openedDays.has(cell.day)}
+              isSelected={featuredDay === cell.day}
+              isToday={isTodayDay(cell.day)}
+              isPast={isPastDay(cell.day)}
               onToggle={handleToggle}
             />
           {/if}
@@ -150,14 +179,16 @@
     padding: clamp(1rem, 3vw, 2.5rem);
   }
   .todaysTask {
-    border: 1px solid rgba(243, 243, 243, 0.2);
+    border: 1px solid var(--accent-color, rgba(243, 243, 243, 0.2));
     border-radius: 20px;
     padding: clamp(1rem, 2.6vw, 1.6rem);
     margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
     background: linear-gradient(140deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01));
     box-shadow:
       inset 0 0 0 1px rgba(255, 255, 255, 0.04),
-      0 18px 30px rgba(0, 0, 0, 0.35);
+      0 18px 30px rgba(0, 0, 0, 0.35),
+      0 0 0 1px var(--accent-color, rgba(243, 243, 243, 0.2)),
+      0 10px 30px color-mix(in srgb, var(--accent-color, rgba(0, 0, 0, 0)) 28%, transparent);
   }
   .todaysHeader {
     display: flex;
@@ -258,6 +289,6 @@
 
   @media (max-width: 520px) {
     .weekdays { font-size: 0.65rem; }
-    .grid { gap: 0.4rem; }
+    .grid { gap: 0.3rem; }
   }
 </style>
