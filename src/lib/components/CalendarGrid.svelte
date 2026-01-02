@@ -9,6 +9,10 @@
   export let monthIndex0 = 0; // Jan
   export let challenges: Challenge[] = [];
 
+  const today = new Date();
+  const todayInMonth =
+    today.getFullYear() === year && today.getMonth() === monthIndex0 ? today.getDate() : null;
+
   // localStorage remembers opened doors
   let openedDays = new Set<number>();
 
@@ -43,29 +47,57 @@
 
   const cells = buildMonthGrid(year, monthIndex0);
 
-  onMount(loadOpened);
+  onMount(() => {
+    loadOpened();
+    featuredDay = resolveInitialFeaturedDay();
+  });
 
   const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
-  let lastOpenedDay: number | null = null;
-
-  function resolveFeaturedDay(): number | null {
-    if (lastOpenedDay) return lastOpenedDay;
+  function resolveInitialFeaturedDay(): number | null {
     if (openedDays.size) return Math.max(...openedDays);
-    const today = new Date();
-    if (today.getFullYear() === year && today.getMonth() === monthIndex0) {
-      return today.getDate();
-    }
-    return null;
+    return todayInMonth;
   }
 
-  $: featuredDay = resolveFeaturedDay();
+  let featuredDay: number | null = resolveInitialFeaturedDay();
   $: featuredChallenge = featuredDay ? challenges[featuredDay - 1] : null;
 
   function handleToggle(day: number) {
-    lastOpenedDay = day;
+    featuredDay = day;
     toggle(day);
   }
+
+  function showToday() {
+    if (todayInMonth) {
+      featuredDay = todayInMonth;
+    }
+  }
+
+  function isPastDay(day: number) {
+    return todayInMonth ? day < todayInMonth : false;
+  }
+
+  function isTodayDay(day: number) {
+    return todayInMonth ? day === todayInMonth : false;
+  }
+
+  const colors = {
+    green: "#4AFC83",
+    yellow: "#FCE312",
+    blue: "#4199D8"
+  } as const;
+
+  $: accentTone = featuredDay
+    ? featuredDay === todayInMonth
+      ? "green"
+      : "blue"
+    : null;
+  $: accentColor =
+    accentTone === "green"
+      ? colors.green
+      : accentTone === "blue"
+        ? colors.blue
+        : "rgba(243, 243, 243, 0.2)";
 </script>
 
 <section class="calendar" aria-label="January challenge calendar">
@@ -73,11 +105,32 @@
     <h1 class="h1">JAMMY {year}</h1>
     <p class="sub">Reveal > Play > Share (#jammy26)</p>
   </header>
-  <section class="todaysTask" aria-label="Today's task">
+  <section class="todaysTask" aria-label="Selected task" style={`--accent-color: ${accentColor}`}>
     <div class="todaysHeader">
-      <p class="todaysLabel">Today's Jammy</p>
-      {#if featuredChallenge}
-        <p class="todaysDay">Day {featuredChallenge.day}</p>
+      <div class="todaysMeta">
+        <p class="todaysLabel">
+          {#if featuredDay === todayInMonth}
+            Today's Jammy
+          {:else if featuredDay}
+            Jammy
+          {:else}
+            Choose a Jammy
+          {/if}
+        </p>
+        {#if featuredChallenge}
+          <p class="todaysDay">Day {featuredChallenge.day}</p>
+        {/if}
+      </div>
+
+      {#if todayInMonth}
+        <button
+          class="todayButton"
+          type="button"
+          on:click={showToday}
+          disabled={featuredDay === todayInMonth}
+        >
+          Show Today
+        </button>
       {/if}
     </div>
 
@@ -86,7 +139,7 @@
       <p class="todaysDesc">{featuredChallenge.challenge}</p>
       <p class="todaysMidi"><strong>MIDI focus:</strong> {featuredChallenge.midiFocus}</p>
     {:else}
-      <p class="todaysEmpty">Open a day to reveal today’s task details.</p>
+      <p class="todaysEmpty">Select a day in the calendar to see its task here.</p>
     {/if}
   </section>
 
@@ -107,6 +160,9 @@
               challenge={challenges[cell.day - 1]}
               unlocked={isUnlocked(cell.day, year, monthIndex0)}
               opened={openedDays.has(cell.day)}
+              isSelected={featuredDay === cell.day}
+              isToday={isTodayDay(cell.day)}
+              isPast={isPastDay(cell.day)}
               onToggle={handleToggle}
             />
           {/if}
@@ -123,21 +179,29 @@
     padding: clamp(1rem, 3vw, 2.5rem);
   }
   .todaysTask {
-    border: 1px solid rgba(243, 243, 243, 0.2);
+    border: 1px solid var(--accent-color, rgba(243, 243, 243, 0.2));
     border-radius: 20px;
     padding: clamp(1rem, 2.6vw, 1.6rem);
     margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
     background: linear-gradient(140deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01));
     box-shadow:
       inset 0 0 0 1px rgba(255, 255, 255, 0.04),
-      0 18px 30px rgba(0, 0, 0, 0.35);
+      0 18px 30px rgba(0, 0, 0, 0.35),
+      0 0 0 1px var(--accent-color, rgba(243, 243, 243, 0.2)),
+      0 10px 30px color-mix(in srgb, var(--accent-color, rgba(0, 0, 0, 0)) 28%, transparent);
   }
   .todaysHeader {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
+    flex-wrap: wrap;
     margin-bottom: 0.6rem;
+  }
+  .todaysMeta {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
   }
   .todaysLabel {
     margin: 0;
@@ -145,6 +209,26 @@
     letter-spacing: 0.12em;
     font-size: 0.72rem;
     opacity: 0.7;
+  }
+  .todayButton {
+    border: 1px solid rgba(243, 243, 243, 0.3);
+    background: rgba(255, 255, 255, 0.06);
+    color: inherit;
+    border-radius: 999px;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+  }
+  .todayButton:hover:not(:disabled) {
+    border-color: rgba(243, 243, 243, 0.6);
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-1px);
+  }
+  .todayButton:disabled {
+    opacity: 0.5;
+    cursor: default;
+    transform: none;
   }
   .todaysDay {
     margin: 0;
@@ -199,10 +283,12 @@
   @media (max-width: 760px) {
     .calendar { padding: 1rem 0.75rem 2rem; }
     .weekdays { gap: 0.4rem; }
+    .todayButton { width: 100%; text-align: center; }
+    .todaysHeader { gap: 0.75rem; }
   }
 
   @media (max-width: 520px) {
     .weekdays { font-size: 0.65rem; }
-    .grid { gap: 0.4rem; }
+    .grid { gap: 0.3rem; }
   }
 </style>
