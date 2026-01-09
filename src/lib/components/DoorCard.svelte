@@ -259,6 +259,8 @@
     padding: 0.85rem;
     background: rgba(10, 10, 12, 0.7);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    overflow-wrap: anywhere;
+    word-break: break-word;    
   }
   .title { margin: 0 0 0.4rem 0; font-size: 1rem; }
   .desc, .midi { margin: 0.25rem 0 0 0; }
